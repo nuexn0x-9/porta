@@ -1,0 +1,187 @@
+# DIAGRAM & PANDUAN PENGGUNAAN PORTA (WINDOWS & LINUX)
+
+Dokumen ini menyediakan diagram alur visual dan panduan langkah demi langkah cara menggunakan **PORTA** untuk pengguna sistem operasi **Windows** dan **Linux**.
+
+---
+
+## 1. Diagram Alur Utama Penggunaan (General Workflow)
+
+```mermaid
+flowchart TD
+    A[💻 Developer Menjalankan App Lokal<br/>contoh: localhost:3000 & localhost:8000] --> B[📁 Masuk ke Direktori Proyek via Terminal]
+    B --> C[⚙️ Jalankan: porta init]
+    C --> D[📝 PORTA mendeteksi port & membuat porta.yaml]
+    D --> E[🚀 Jalankan: porta start]
+    E --> F[🔒 PORTA membuka Gateway 127.0.0.1 & Cloudflare HTTPS Tunnel]
+    F --> G[🌐 Mendapatkan Public URL<br/>https://random-slug.trycloudflare.com]
+    G --> H[📱 Bagikan URL ke Client, QA, atau Webhook]
+    H --> I[🛑 Tekan Ctrl+C untuk berhenti dan menutup tunnel]
+```
+
+---
+
+## 2. Diagram Penggunaan Pengguna WINDOWS
+
+### 2.1 Alur Kerja Pengguna Windows (PowerShell / CMD)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Dev as Developer (Windows)
+    participant PS as PowerShell / CMD
+    participant Porta as PORTA (porta.exe)
+    participant LocalApp as App Lokal (:3000 / :8000)
+    participant Cloud as Cloudflare Quick Tunnel
+    actor User as Klien / QA / Smartphone
+
+    Note over Dev,PS: Tahap 1: Persiapan Aplikasi
+    Dev->>PS: Jalankan Vite / React / API (npm run dev)
+    PS->>LocalApp: App Aktif di localhost:3000
+
+    Note over Dev,Porta: Tahap 2: Inisialisasi & Start PORTA
+    Dev->>PS: porta init
+    Porta-->>PS: File porta.yaml terbuat otomatis
+    Dev->>PS: porta start
+    Porta->>Porta: Buka Reverse Proxy di 127.0.0.1:0 (Ephemeral)
+    Porta->>Cloud: Hubungkan HTTPS Tunnel
+    Cloud-->>Porta: Public URL Dialokasikan
+    Porta-->>PS: Tampilkan TUI Live Status & URL Publik
+
+    Note over User,LocalApp: Tahap 3: Akses Publik
+    User->>Cloud: Buka https://slug.trycloudflare.com
+    Cloud->>Porta: Teruskan Request ke PORTA Gateway
+    Porta->>LocalApp: Reverse Proxy ke localhost:3000
+    LocalApp-->>Porta: Response HTML/JSON
+    Porta-->>User: Halaman Web Tampil di Perangkat Pengguna
+
+    Note over Dev,Porta: Tahap 4: Selesai Sesi
+    Dev->>PS: Tekan Ctrl+C
+    Porta->>Cloud: Putus Tunnel & Bersihkan Resource (< 500ms)
+```
+
+### 2.2 Langkah Praktis di Windows:
+
+```powershell
+# 1. Pastikan aplikasi Anda sudah berjalan di localhost
+npm run dev
+
+# 2. Buka jendela PowerShell baru di folder proyek Anda
+cd C:\Users\nama-user\my-project
+
+# 3. Cek kesiapan sistem & driver tunnel
+porta doctor
+
+# 4. Inisialisasi konfigurasi otomatis
+porta init
+
+# 5. Jalankan PORTA (Akan muncul TUI interaktif dengan URL HTTPS publik)
+porta start
+
+# 6. Selesai: Tekan Ctrl + C untuk keluar
+```
+
+---
+
+## 3. Diagram Penggunaan Pengguna LINUX
+
+### 3.1 Alur Kerja Pengguna Linux (Bash / Zsh)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Dev as Developer (Linux)
+    participant Bash as Terminal (Bash/Zsh)
+    participant Porta as Binary PORTA (/usr/local/bin/porta)
+    participant Service as Node.js/Python/Go Server
+    participant Edge as Cloudflare Anycast Edge
+    actor Tester as External Tester / Webhook
+
+    Dev->>Bash: python3 main.py (Port 8000)
+    Bash->>Service: Service listening on 127.0.0.1:8000
+
+    Dev->>Bash: porta init
+    Porta-->>Bash: porta.yaml created
+
+    Dev->>Bash: porta start
+    Porta->>Porta: Ephemeral Loopback Bind (127.0.0.1:0)
+    Porta->>Edge: Establish Encrypted QUIC/mTLS Session
+    Edge-->>Porta: Assigned Public URL (https://*.trycloudflare.com)
+    Porta-->>Bash: Render Live ANSI Terminal UI
+
+    Tester->>Edge: GET /api/v1/data
+    Edge->>Porta: Proxy request through encrypted tunnel
+    Porta->>Porta: SSRF Check & Path Routing (/api -> :8000)
+    Porta->>Service: Forward request to 127.0.0.1:8000
+    Service-->>Porta: Response 200 OK
+    Porta-->>Tester: Stream Response to Tester
+
+    Dev->>Bash: Ctrl + C (SIGINT)
+    Porta->>Edge: Close Tunnel Connection Gracefully
+```
+
+### 3.2 Langkah Praktis di Linux:
+
+```bash
+# 1. Jalankan aplikasi lokal Anda
+python3 -m http.server 8000
+
+# 2. Buka terminal di direktori proyek
+cd ~/projects/my-app
+
+# 3. Inisialisasi porta.yaml
+porta init
+
+# 4. Jalankan PORTA
+porta start
+
+# 5. Cek log secara terpisah jika diperlukan (di terminal lain):
+porta logs -f
+
+# 6. Hentikan dengan Ctrl + C
+```
+
+---
+
+## 4. Diagram Arsitektur Routing Multi-Service
+
+Diagram ini menunjukkan bagaimana PORTA membagi satu URL publik ke beberapa aplikasi lokal yang berbeda:
+
+```mermaid
+graph LR
+    subgraph Internet["Public Internet"]
+        Client["📱 Browser / Klien Luar"]
+    end
+
+    subgraph TunnelEdge["Cloudflare Edge"]
+        Edge["https://demo.trycloudflare.com"]
+    end
+
+    subgraph Workstation["Komputer Developer (Windows / Linux)"]
+        Gateway["PORTA Gateway<br/>(127.0.0.1:0)"]
+        Router["LPM Router"]
+        
+        Frontend["Frontend App<br/>localhost:3000<br/>(Route: /)"]
+        Backend["Backend API<br/>localhost:8000<br/>(Route: /api)"]
+        WS["WebSocket Server<br/>localhost:9001<br/>(Route: /ws)"]
+    end
+
+    Client -->|HTTPS Request| Edge
+    Edge -->|Encrypted Tunnel| Gateway
+    Gateway --> Router
+    Router -->|Path: /| Frontend
+    Router -->|Path: /api/*| Backend
+    Router -->|Path: /ws| WS
+```
+
+---
+
+## 5. Ringkasan Perintah CLI untuk Windows & Linux
+
+| Perintah | Fungsi di Windows (PowerShell) | Fungsi di Linux (Bash/Zsh) |
+| :--- | :--- | :--- |
+| `porta doctor` | Diagnostik loopback, driver, dan koneksi internet | Diagnostik izin, soket, dan driver tunnel |
+| `porta init` | Scan port web otomatis & buat `porta.yaml` | Scan port web otomatis & buat `porta.yaml` |
+| `porta start` | Jalankan gateway & tunnel publik (TUI) | Jalankan gateway & tunnel publik (TUI) |
+| `porta status` | Tampilkan status servis terdaftar | Tampilkan status servis terdaftar |
+| `porta logs -f`| Pantau log akses real-time dari `.porta/logs/` | Tail log akses real-time dari `.porta/logs/` |
+| `porta config` | Validasi format file `porta.yaml` | Validasi format file `porta.yaml` |
