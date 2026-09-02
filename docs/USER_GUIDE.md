@@ -260,4 +260,20 @@ porta start
   ```
 
 ---
+
+## 5. Uninstallation
+
+To cleanly remove PORTA and its global configuration:
+
+### Windows (PowerShell)
+```powershell
+irm https://raw.githubusercontent.com/nuexn0x-9/porta/main/scripts/uninstall-windows.ps1 | iex
+```
+
+### Linux / macOS (Shell)
+```bash
+curl -fsSL https://raw.githubusercontent.com/nuexn0x-9/porta/main/scripts/uninstall-posix.sh | sh
+```
+
+---
 *End of User Guide.*

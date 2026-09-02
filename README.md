@@ -128,6 +128,22 @@ PORTA launches the reverse proxy gateway, establishes the secure HTTPS Cloudflar
 | `porta doctor` | Check loopback networking, internet connectivity, and drivers. |
 
 ---
+
+## 🗑️ Uninstallation
+
+To completely remove PORTA and its global configuration from your system:
+
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/nuexn0x-9/porta/main/scripts/uninstall-windows.ps1 | iex
+```
+
+**Linux & macOS (Shell):**
+```bash
+curl -fsSL https://raw.githubusercontent.com/nuexn0x-9/porta/main/scripts/uninstall-posix.sh | sh
+```
+
+---
 <p align="center">
   <img src="docs/images/porta-usage-infographic.png" 
        alt="PORTA Usage Infographic"
