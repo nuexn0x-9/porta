@@ -31,6 +31,9 @@ func init() {
 	RootCmd.AddCommand(logsCmd)
 	RootCmd.AddCommand(configCmd)
 	RootCmd.AddCommand(doctorCmd)
+	RootCmd.AddCommand(setupCmd)
+	RootCmd.AddCommand(upgradeCmd)
+	RootCmd.AddCommand(versionCmd)
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

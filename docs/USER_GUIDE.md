@@ -181,7 +181,48 @@ porta start
 
 ---
 
-### 4.5 `porta config`
+### 4.5 `porta setup`
+- **Purpose:** Initializes user directory structure (`~/.porta/`), generates default `~/.porta/config/global.yaml`, verifies loopback bindability, and pre-caches the Cloudflare tunnel driver.
+- **Usage:** `porta setup`
+- **Example Output:**
+  ```text
+  [i] Initializing PORTA environment...
+    [✓] System detected       : windows/amd64
+    [✓] Directory structure   : ~/.porta/ initialized
+    [✓] Loopback interface    : 127.0.0.1 bindable
+    [✓] Internet connectivity : DNS & HTTPS connection OK
+    [✓] Tunnel driver         : Ready (~/.porta/bin/cloudflared.exe)
+  ```
+
+---
+
+### 4.6 `porta upgrade`
+- **Purpose:** Checks GitHub Releases for updates and performs atomic in-place binary upgrades with SHA-256 checksum verification.
+- **Usage:** `porta upgrade`
+- **Example Output:**
+  ```text
+  [i] Current PORTA version: v1.1.0
+  [i] Checking GitHub Releases for updates...
+  [✓] You are already on the latest version (v1.1.0)!
+  ```
+
+---
+
+### 4.7 `porta version`
+- **Purpose:** Prints version, commit hash, build date, and Go runtime environment.
+- **Usage:** `porta version [--json]`
+- **Flags:**
+  - `--json`: Output metadata in structured JSON format.
+- **Example Output:**
+  ```text
+  PORTA version v1.1.0 (release) windows/amd64
+  Build date : 2026-09-02
+  Go runtime : go1.27.0
+  ```
+
+---
+
+### 4.8 `porta config`
 - **Purpose:** Validates syntax and displays parsed configuration model.
 - **Usage:** `porta config [-c porta.yaml]`
 - **Example Output:**
@@ -196,7 +237,7 @@ porta start
 
 ---
 
-### 4.6 `porta doctor`
+### 4.9 `porta doctor`
 - **Purpose:** Runs diagnostic health checks on system, networking, and drivers.
 - **Usage:** `porta doctor`
 - **Example Output:**

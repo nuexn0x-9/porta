@@ -39,14 +39,21 @@ Backend    (localhost:8000) ──┘         │
 
 ## ⚡ Quick Start
 
-### 1. Installation
+### 1. Automated Installation (Single Command)
 
-Download the pre-compiled standalone binary from the [GitHub Releases](https://github.com/nuexn0x-9/porta/releases) page:
-
-```bash
-# Verify installation
-porta doctor
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/nuexn0x-9/porta/main/scripts/install-windows.ps1 | iex
 ```
+
+**Linux & macOS (Shell):**
+```bash
+curl -fsSL https://raw.githubusercontent.com/nuexn0x-9/porta/main/scripts/install-posix.sh | sh
+```
+
+*(Alternatively, download pre-compiled standalone executables from [GitHub Releases](https://github.com/nuexn0x-9/porta/releases)).*
+
+---
 
 ### 2. Initialize in your project
 In your project directory where your local apps are running:
@@ -100,6 +107,9 @@ security:
 | `porta start` | Start the reverse proxy gateway and public tunnel in foreground. |
 | `porta status` | Inspect configured services, routes, and JSON status. |
 | `porta logs` | Tail and filter structured access logs. |
+| `porta setup` | Initialize `~/.porta/` runtime environment and pre-cache drivers. |
+| `porta upgrade` | Check for updates and self-upgrade binary in-place. |
+| `porta version` | Print version and build metadata (`--json` supported). |
 | `porta config` | Validate syntax and display parsed configuration. |
 | `porta doctor` | Check loopback networking, internet connectivity, and drivers. |
 

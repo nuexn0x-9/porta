@@ -21,13 +21,17 @@ jobs:
         with:
           go-version: '1.22'
 
-      - name: Build Cross-Platform Binaries
+      - name: Build Cross-Platform Binaries & Checksums
         run: |
           mkdir -p dist
           GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s -w" -o dist/porta-windows-amd64.exe ./cmd/porta
           GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s -w" -o dist/porta-linux-amd64 ./cmd/porta
+          GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="-s -w" -o dist/porta-linux-arm64 ./cmd/porta
           GOOS=darwin GOARCH=arm64 CGO_ENABLED=0 go build -ldflags="-s -w" -o dist/porta-darwin-arm64 ./cmd/porta
           GOOS=darwin GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-s -w" -o dist/porta-darwin-amd64 ./cmd/porta
+          cd dist
+          sha256sum porta-* > checksums.txt
+          cd ..
 
       - name: Create GitHub Release and Upload Assets
         uses: softprops/action-gh-release@v2
@@ -35,7 +39,9 @@ jobs:
           files: |
             dist/porta-windows-amd64.exe
             dist/porta-linux-amd64
+            dist/porta-linux-arm64
             dist/porta-darwin-arm64
             dist/porta-darwin-amd64
+            dist/checksums.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

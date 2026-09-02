@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-09-02
+
+### Added
+- **Automated Installers:** One-line PowerShell installer (`scripts/install-windows.ps1`) and POSIX shell installer (`scripts/install-posix.sh`) with dynamic OS/architecture detection and SHA-256 integrity verification.
+- **Uninstaller Scripts:** Automated uninstallers (`scripts/uninstall-windows.ps1`, `scripts/uninstall-posix.sh`) with PATH cleanup and optional runtime data purge.
+- **First Run Setup (`porta setup`):** Initial setup engine that creates `~/.porta/`, generates `~/.porta/config/global.yaml`, verifies loopback socket bindability, and pre-caches tunnel drivers.
+- **Self-Upgrade Engine (`porta upgrade`):** In-place binary self-upgrade checking GitHub Releases API with SHA-256 verification and atomic executable swap.
+- **Version Command (`porta version`):** Version metadata inspector with commit hash, build date, Go runtime, and `--json` support.
+- **CI/CD Release Automation:** Automatic SHA-256 `checksums.txt` computation and release asset uploading via GitHub Actions.
+
+---
+
 ## [1.0.0] - 2026-09-02
 
 ### Added
