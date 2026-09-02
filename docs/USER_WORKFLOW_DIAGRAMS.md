@@ -1,21 +1,46 @@
-# DIAGRAM & PANDUAN PENGGUNAAN PORTA (WINDOWS & LINUX)
+# DIAGRAM & PANDUAN LENGKAP PENGGUNAAN PORTA (DARI AWAL DOWNLOAD)
 
-Dokumen ini menyediakan diagram alur visual dan panduan langkah demi langkah cara menggunakan **PORTA** untuk pengguna sistem operasi **Windows** dan **Linux**.
+Dokumen ini menyediakan diagram visual lengkap mulai dari **mengunduh PORTA pertama kali**, inisialisasi proyek, hingga menjalankan terowongan publik di **Windows** dan **Linux**.
 
 ---
 
-## 1. Diagram Alur Utama Penggunaan (General Workflow)
+## 1. Diagram Alur Lengkap dari Awal (Download -> Run -> Share)
 
 ```mermaid
 flowchart TD
-    A[💻 Developer Menjalankan App Lokal<br/>contoh: localhost:3000 & localhost:8000] --> B[📁 Masuk ke Direktori Proyek via Terminal]
-    B --> C[⚙️ Jalankan: porta init]
-    C --> D[📝 PORTA mendeteksi port & membuat porta.yaml]
-    D --> E[🚀 Jalankan: porta start]
-    E --> F[🔒 PORTA membuka Gateway 127.0.0.1 & Cloudflare HTTPS Tunnel]
-    F --> G[🌐 Mendapatkan Public URL<br/>https://random-slug.trycloudflare.com]
-    G --> H[📱 Bagikan URL ke Client, QA, atau Webhook]
-    H --> I[🛑 Tekan Ctrl+C untuk berhenti dan menutup tunnel]
+    subgraph FASE_1["FASE 1: Download & Install PORTA (Hanya 1x di Awal)"]
+        A1["🌐 Buka GitHub Releases:<br/>github.com/nuexn0x-9/porta/releases"] --> A2["📥 Unduh Binary Sesuai OS:<br/>• Windows: porta.exe<br/>• Linux/macOS: porta"]
+        A2 --> A3["📂 Pindahkan ke Folder PATH<br/>(misal: C:\Windows\System32 atau /usr/local/bin)"]
+        A3 --> A4["🔍 Verifikasi di Terminal:<br/>porta doctor"]
+    end
+
+    subgraph FASE_2["FASE 2: Persiapan Aplikasi Lokal"]
+        B1["💻 Developer Menjalankan App Lokal<br/>(contoh: npm run dev di port 3000 / 8000)"]
+    end
+
+    subgraph FASE_3["FASE 3: Inisialisasi Proyek"]
+        C1["📁 Buka Terminal di Folder Proyek"] --> C2["⚙️ Ketik: porta init"]
+        C2 --> C3["🔍 PORTA Scan Port Lokal Secara Offline"]
+        C3 --> C4["📝 Terbentuk File: porta.yaml"]
+    end
+
+    subgraph FASE_4["FASE 4: Menjalankan PORTA"]
+        D1["🚀 Ketik: porta start"] --> D2{"Apakah driver cloudflared<br/>sudah ada di ~/.porta/bin/?"}
+        D2 -- Belum Ada --> D3["⬇️ PORTA Otomatis Download Driver Tunnel"]
+        D2 -- Sudah Ada --> D4["⚡ PORTA Langsung Buka Gateway 127.0.0.1"]
+        D3 --> D4
+        D4 --> D5["🔒 Cloudflare Quick Tunnel Terhubung"]
+        D5 --> D6["🌐 Muncul Public URL HTTPS<br/>(https://xxxx.trycloudflare.com)"]
+    end
+
+    subgraph FASE_5["FASE 5: Penggunaan & Selesai"]
+        E1["📱 Bagikan URL ke Klien / QA / Webhook"] --> E2["🛑 Tekan Ctrl+C di Terminal untuk Berhenti"]
+    end
+
+    FASE_1 --> FASE_2
+    FASE_2 --> FASE_3
+    FASE_3 --> FASE_4
+    FASE_4 --> FASE_5
 ```
 
 ---
