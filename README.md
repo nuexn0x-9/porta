@@ -55,22 +55,20 @@ curl -fsSL https://raw.githubusercontent.com/nuexn0x-9/porta/main/scripts/instal
 
 ---
 
-### 2. Initialize in your project
-In your project directory where your local apps are running:
+### 2. Configure Your Project
+
+Make sure your local application server is already running (e.g. `npm run dev` or `python main.py`), then choose either **Auto-Detection** or **Manual Configuration**:
+
+#### 🔹 Option A: Auto-Detection (Fastest)
+In your project directory, let PORTA automatically scan listening localhost ports and generate `porta.yaml`:
 ```bash
 porta init
+# Or use --force to overwrite an existing config:
+porta init --force
 ```
-PORTA automatically detects active listening ports and creates a starter `porta.yaml`.
 
-### 3. Start PORTA
-```bash
-porta start
-```
-PORTA launches the embedded gateway, connects the public HTTPS tunnel, and displays the live TUI in your terminal!
-
----
-
-## 🛠️ Configuration Example (`porta.yaml`)
+#### 🔹 Option B: Manual Configuration (`porta.yaml`)
+Create or edit `porta.yaml` directly in your project root:
 
 ```yaml
 version: "1"
@@ -79,23 +77,39 @@ project:
   name: my-app
 
 services:
-  # Single or multi-service configuration
+  # 1. Frontend Web App
   frontend:
     port: 3000
     route: /
 
+  # 2. Backend REST API
   backend:
     port: 8000
     route: /api
     strip_path: false
-    health_check:
-      path: /healthz
-      interval: 5s
 
+# (Optional) Basic Auth Security
 security:
   mode: password
-  password: ${PORTA_PASSWORD:-admin:SecretDemo123}
+  password: "admin:SecretDemo123"
 ```
+
+Verify your configuration syntax:
+```bash
+porta config
+```
+
+---
+
+### 3. Start Public Exposure
+
+```bash
+porta start
+```
+
+PORTA launches the reverse proxy gateway, establishes the secure HTTPS Cloudflare Tunnel, and displays the interactive live status TUI in your terminal! Share the public URL with your team, clients, or webhook providers.
+
+---
 
 ---
 

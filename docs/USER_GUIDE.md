@@ -8,56 +8,64 @@ Welcome to **PORTA** — the developer tool that exposes your local multi-servic
 
 PORTA is distributed as a single static binary with zero external runtime dependencies.
 
-### Windows
-1. Download `porta.exe` from the latest GitHub Release.
-2. Place `porta.exe` in a folder included in your system `PATH` (e.g., `C:\Program Files\PORTA\` or `%USERPROFILE%\bin\`).
-3. Open PowerShell or Command Prompt and verify:
-   ```powershell
-   porta doctor
-   ```
+### Automated 1-Line Installer (Recommended)
 
-### macOS
-1. Download the macOS binary (`porta`) for your architecture (Apple Silicon / Intel).
-2. Make the binary executable and move it to `/usr/local/bin`:
-   ```bash
-   chmod +x porta
-   sudo mv porta /usr/local/bin/porta
-   porta doctor
-   ```
+**Windows (PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/nuexn0x-9/porta/main/scripts/install-windows.ps1 | iex
+```
 
-### Linux
-1. Download the Linux binary (`porta`) for your architecture (x86_64 / ARM64).
-2. Make it executable and place it in `/usr/local/bin`:
-   ```bash
-   chmod +x porta
-   sudo mv porta /usr/local/bin/porta
-   porta doctor
-   ```
+**Linux & macOS (Shell):**
+```bash
+curl -fsSL https://raw.githubusercontent.com/nuexn0x-9/porta/main/scripts/install-posix.sh | sh
+```
+
+*(Installer will automatically download the binary, verify SHA-256 integrity, configure PATH, and run `porta setup`).*
 
 ---
 
-## 2. Quickstart Tutorial: Single Service (e.g., Vite/React on `:3000`)
+### Manual Download & Setup
 
-### Step 1: Initialize Configuration
+- **Windows:** Download `porta-windows-amd64.exe` from [GitHub Releases](https://github.com/nuexn0x-9/porta/releases), rename to `porta.exe`, and place in `%LOCALAPPDATA%\PORTA\bin\` or another directory in your `PATH`.
+- **Linux/macOS:** Download the binary for your architecture, run `chmod +x porta`, and move it to `/usr/local/bin/porta`.
+- **Verify:** Run `porta doctor` to verify system readiness.
+
+---
+
+## 2. Quickstart Tutorial: Single & Multi-Service
+
+### Step 1: Prepare your Application
+Ensure your local web server (e.g. Next.js on `3000`, Vite on `5173`, or FastAPI on `8000`) is running.
+
+### Step 2: Configure PORTA (Auto or Manual)
+
+#### Option A: Auto-Detection (Fastest)
 In your project root directory:
 ```bash
 porta init
 ```
-PORTA automatically detects port `3000` and creates `porta.yaml`:
+PORTA automatically detects active listening ports and creates `porta.yaml`.
+
+#### Option B: Manual Configuration
+Create or edit `porta.yaml` directly:
 ```yaml
-# porta.yaml
 version: "1"
 
 project:
   name: my-web-app
 
 services:
-  app:
+  frontend:
     port: 3000
     route: /
+
+  backend:
+    port: 8000
+    route: /api
+    strip_path: false
 ```
 
-### Step 2: Start PORTA
+### Step 3: Start PORTA
 ```bash
 porta start
 ```
