@@ -104,7 +104,16 @@ security:
 | `porta doctor` | Check loopback networking, internet connectivity, and drivers. |
 
 ---
+<p align="center">
+  <img src="docs/images/porta-usage-infographic.png" 
+       alt="PORTA Usage Infographic"
+       width="100%">
+</p>
 
+<p align="center">
+Expose Your Localhost to The World, Securely.
+</p>
+---
 ## 📚 Documentation
 
 - [User Guide & Tutorials](docs/USER_GUIDE.md)
