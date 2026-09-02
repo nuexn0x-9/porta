@@ -9,28 +9,33 @@ param (
 
 $ErrorActionPreference = "Stop"
 
-function Write-Info($msg) {
+function Log-Info {
+    param([string]$Message)
     if (-not $Silent) {
-        Write-Host "[i] $msg" -ForegroundColor Cyan
+        Write-Host "[i] $Message" -ForegroundColor Cyan
     }
 }
 
-function Write-Success($msg) {
+function Log-Success {
+    param([string]$Message)
     if (-not $Silent) {
-        Write-Host "[✓] $msg" -ForegroundColor Green
+        Write-Host "[+] $Message" -ForegroundColor Green
     }
 }
 
-function Write-Err($msg) {
-    Write-Host "[✗] $msg" -ForegroundColor Red
+function Log-Err {
+    param([string]$Message)
+    Write-Host "[x] $Message" -ForegroundColor Red
 }
 
-Write-Host ""
-Write-Host "╔════════════════════════════════════════════════════════════╗" -ForegroundColor Blue
-Write-Host "║              PORTA Installer for Windows                   ║" -ForegroundColor Cyan
-Write-Host "║     Local Multi-Service Public Exposure Platform           ║" -ForegroundColor Blue
-Write-Host "╚════════════════════════════════════════════════════════════╝" -ForegroundColor Blue
-Write-Host ""
+if (-not $Silent) {
+    Write-Host ""
+    Write-Host "============================================================" -ForegroundColor Blue
+    Write-Host "              PORTA Installer for Windows                   " -ForegroundColor Cyan
+    Write-Host "     Local Multi-Service Public Exposure Platform           " -ForegroundColor Blue
+    Write-Host "============================================================" -ForegroundColor Blue
+    Write-Host ""
+}
 
 # 1. Determine Architecture
 $arch = "amd64"
@@ -38,23 +43,23 @@ if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") {
     $arch = "arm64"
 }
 $assetName = "porta-windows-$arch.exe"
-Write-Info "Target system: Windows ($arch)"
+Log-Info "Target system: Windows ($arch)"
 
 # 2. Resolve Release Version
 $repo = "nuexn0x-9/porta"
 $downloadVersion = $Version
 
 if ($Version -eq "latest") {
-    Write-Info "Resolving latest stable release from GitHub..."
+    Log-Info "Resolving latest stable release from GitHub..."
     try {
         $releaseJson = Invoke-RestMethod -Uri "https://api.github.com/repos/$repo/releases/latest" -Headers @{"User-Agent"="PORTA-Installer"}
         $downloadVersion = $releaseJson.tag_name
     } catch {
-        $downloadVersion = "v1.0.0"
+        $downloadVersion = "v1.1.0"
     }
 }
 
-Write-Info "Installing PORTA version: $downloadVersion"
+Log-Info "Installing PORTA version: $downloadVersion"
 
 # 3. Prepare Target Directories
 if (-not (Test-Path $InstallDir)) {
@@ -69,16 +74,21 @@ $checksumFile = Join-Path $InstallDir "checksums.txt"
 $downloadUrl = "https://github.com/$repo/releases/download/$downloadVersion/$assetName"
 $checksumUrl = "https://github.com/$repo/releases/download/$downloadVersion/checksums.txt"
 
-Write-Info "Downloading $assetName..."
+Log-Info "Downloading $assetName..."
 try {
     Invoke-WebRequest -Uri $downloadUrl -OutFile $tempExe -UseBasicParsing
 } catch {
-    Write-Err "Failed to download $assetName from $downloadUrl: $_"
-    exit 1
+    # If GitHub Release asset is not published yet, copy from local build if present for local test
+    if (Test-Path ".\dist\$assetName") {
+        Copy-Item ".\dist\$assetName" $tempExe -Force
+        Log-Info "Using local release binary for staging."
+    } else {
+        Log-Err "Failed to download $assetName from $downloadUrl"
+        exit 1
+    }
 }
 
 # Checksum Verification
-$checksumVerified = $false
 try {
     Invoke-WebRequest -Uri $checksumUrl -OutFile $checksumFile -UseBasicParsing
     if (Test-Path $checksumFile) {
@@ -87,41 +97,39 @@ try {
         if ($expectedLine) {
             $expectedHash = ($expectedLine -split '\s+')[0].ToLower()
             if ($actualHash -eq $expectedHash) {
-                $checksumVerified = $true
-                Write-Success "SHA-256 integrity verified ($actualHash)"
+                Log-Success "SHA-256 integrity verified ($actualHash)"
             } else {
-                Write-Err "Checksum mismatch! Expected: $expectedHash, got: $actualHash"
+                Log-Err "Checksum mismatch! Expected: $expectedHash, got: $actualHash"
                 Remove-Item -Force $tempExe, $checksumFile -ErrorAction SilentlyContinue
                 exit 1
             }
         }
     }
 } catch {
-    Write-Info "Release checksums.txt not published; continuing with downloaded binary."
+    Log-Info "Release checksums.txt not available; proceeding with binary."
 } finally {
     Remove-Item -Force $checksumFile -ErrorAction SilentlyContinue
 }
 
 # 5. Place Binary
 Move-Item -Path $tempExe -Destination $targetExe -Force
-Write-Success "PORTA binary installed to $targetExe"
+Log-Success "PORTA binary installed to $targetExe"
 
 # 6. Configure User PATH
 $userPath = [Environment]::GetEnvironmentVariable("Path", "User")
 if ($userPath -split ';' -notcontains $InstallDir) {
-    Write-Info "Adding $InstallDir to User PATH..."
+    Log-Info "Adding $InstallDir to User PATH..."
     $newUserPath = if ($userPath) { "$userPath;$InstallDir" } else { $InstallDir }
     [Environment]::SetEnvironmentVariable("Path", $newUserPath, "User")
     $env:Path = "$env:Path;$InstallDir"
-    Write-Success "User PATH updated successfully."
+    Log-Success "User PATH updated successfully."
 } else {
-    Write-Success "$InstallDir is already in User PATH."
+    Log-Success "$InstallDir is already in User PATH."
 }
 
 # 7. Run Setup
 if (-not $NoSetup) {
-    Write-Host ""
     & $targetExe setup
 } else {
-    Write-Success "Installation complete! Run 'porta doctor' to verify."
+    Log-Success "Installation complete! Run 'porta doctor' to verify."
 }

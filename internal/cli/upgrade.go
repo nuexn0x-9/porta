@@ -36,6 +36,11 @@ var upgradeCmd = &cobra.Command{
 		}
 		defer resp.Body.Close()
 
+		if resp.StatusCode == http.StatusNotFound {
+			fmt.Printf("[✓] You are running the latest development/baseline version (%s). No newer releases published on GitHub.\n", Version)
+			return nil
+		}
+
 		if resp.StatusCode != http.StatusOK {
 			return fmt.Errorf("GitHub API returned status: %d", resp.StatusCode)
 		}
