@@ -28,6 +28,9 @@
 PORTA v1.0.0 OPEN SOURCE RELEASE:
 >> CERTIFIED: READY FOR GITHUB RELEASE <<
 =====================================================
+Commit: 4f8a9df
+Tag:    v1.0.0
+Remote: https://github.com/nuexn0x-9/porta.git
 ```
 
 ---
