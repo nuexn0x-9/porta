@@ -154,6 +154,24 @@ curl -fsSL https://raw.githubusercontent.com/nuexn0x-9/porta/main/scripts/uninst
 Expose Your Localhost to The World, Securely.
 </p>
 ---
+<p align="center">
+  <img src="docs/images/porta-usage-infographic2.png" 
+       alt="PORTA Usage Infographic"
+       width="100%">
+</p>
+
+<p align="center">
+Expose Your Localhost to The World, Securely.
+---
+<p align="center">
+  <img src="docs/images/porta-usage-infographic3.png" 
+       alt="PORTA Usage Infographic"
+       width="100%">
+</p>
+
+<p align="center">
+Expose Your Localhost to The World, Securely.
+---
 ## 📚 Documentation
 
 - [User Guide & Tutorials](docs/USER_GUIDE.md)
