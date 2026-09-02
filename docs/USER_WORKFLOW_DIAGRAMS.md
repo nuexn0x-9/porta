@@ -202,13 +202,121 @@ graph LR
 
 ---
 
-## 5. Ringkasan Perintah CLI untuk Windows & Linux
+## 5. Diagram Setup & Konfigurasi: Cara Otomatis vs Cara Manual
 
-| Perintah | Fungsi di Windows (PowerShell) | Fungsi di Linux (Bash/Zsh) |
+Berikut adalah alur perbandingan lengkap antara **Konfigurasi Otomatis (Auto)** dan **Konfigurasi Manual**:
+
+```mermaid
+flowchart TD
+    Start(["🚀 Mulai Projek Baru / Ganti Service"]) --> SetupCheck{"Apakah PORTA<br/>Sudah Terpasang?"}
+
+    %% Tahap Setup
+    subgraph SETUP["1. Setup & Instalasi (Hanya 1x di Awal)"]
+        SetupCheck -- Belum --> InstallChoice["Pilih Sistem Operasi:"]
+        InstallChoice --> WinInst["Windows PowerShell:<br/><code>irm https://.../install-windows.ps1 | iex</code>"]
+        InstallChoice --> PosixInst["Linux / macOS:<br/><code>curl -fsSL https://.../install-posix.sh | sh</code>"]
+        WinInst --> AutoSetup["Otomatis Menjalankan:<br/><code>porta setup</code>"]
+        PosixInst --> AutoSetup
+    end
+
+    SetupCheck -- Sudah Terpasang --> RunApps
+    AutoSetup --> RunApps["💻 Jalankan Aplikasi / Server Lokal Anda<br/>(Contoh: Vite di :5173, Django di :8000)"]
+
+    RunApps --> ConfigChoice{"Pilih Metode<br/>Konfigurasi:"}
+
+    %% Cara Otomatis
+    subgraph AUTO["2. CARA OTOMATIS (Auto Detection)"]
+        ConfigChoice -- Opsi A: Auto --> AutoInit["Ketik di Terminal:<br/><code>porta init</code><br/><i>(atau <code>porta init --force</code>)</i>"]
+        AutoInit --> Scanner["🔍 PORTA Scan Port Lokal yang Aktif<br/>(Deteksi port 3000, 5173, 8000, dll)"]
+        Scanner --> GenYAML["📝 Otomatis Menghasilkan <code>porta.yaml</code><br/>dengan routing standar (/)"]
+    end
+
+    %% Cara Manual
+    subgraph MANUAL["3. CARA MANUAL (Custom Config)"]
+        ConfigChoice -- Opsi B: Manual --> EditFile["Buka / Buat file <code>porta.yaml</code><br/>di Text Editor (VS Code / Notepad)"]
+        EditFile --> SetService["Tentukan Service & Port:<br/>• Single Service (:5173 -> /)<br/>• Multi-Service (:5173 -> /, :8000 -> /api)<br/>• Proteksi Password / Token"]
+        SetService --> Validate["Cek Validasi Konfigurasi:<br/><code>porta config</code>"]
+    end
+
+    GenYAML --> StartPorta
+    Validate --> StartPorta
+
+    %% Menjalankan PORTA
+    subgraph RUN["4. Menjalankan & Menguji"]
+        StartPorta["🚀 Ketik: <code>porta start</code>"] --> CheckTunnel["🌐 Terhubung ke Cloudflare Tunnel"]
+        CheckTunnel --> Ready["✅ Public HTTPS URL Aktif!<br/>Siap diakses dari luar / HP / Klien"]
+    end
+```
+
+---
+
+### Perbandingan Langkah Praktis:
+
+#### A. Cara Otomatis (Auto)
+Cocok untuk pemula atau saat berpindah ke projek baru:
+```powershell
+# 1. Masuk ke folder projek Anda
+cd G:\projek-anda
+
+# 2. Jalankan aplikasi lokal Anda terlebih dahulu
+npm run dev
+
+# 3. Jalankan inisialisasi otomatis
+porta init
+
+# 4. Langsung jalankan PORTA
+porta start
+```
+
+#### B. Cara Manual (Custom Multi-Service & Password)
+Cocok jika Anda memiliki arsitektur Frontend + Backend + WebSocket atau ingin menambahkan proteksi password:
+```yaml
+# Simpan sebagai: porta.yaml di root folder projek Anda
+version: "1"
+
+project:
+  name: my-custom-app
+
+services:
+  # Service 1: Frontend (Next.js / Vite / React)
+  frontend:
+    port: 3000
+    route: /
+
+  # Service 2: Backend REST API
+  backend:
+    port: 8000
+    route: /api
+    strip_path: false
+
+# Opsional: Keamanan Password
+security:
+  mode: password
+  password: "admin:Demo12345"
+```
+
+Setelah file disimpan:
+```powershell
+# 1. Validasi sintaks file konfigurasi
+porta config
+
+# 2. Jalankan PORTA
+porta start
+```
+
+---
+
+## 6. Ringkasan Perintah CLI Lengkap
+
+| Perintah | Fungsi Utama | Kapan Digunakan? |
 | :--- | :--- | :--- |
-| `porta doctor` | Diagnostik loopback, driver, dan koneksi internet | Diagnostik izin, soket, dan driver tunnel |
-| `porta init` | Scan port web otomatis & buat `porta.yaml` | Scan port web otomatis & buat `porta.yaml` |
-| `porta start` | Jalankan gateway & tunnel publik (TUI) | Jalankan gateway & tunnel publik (TUI) |
-| `porta status` | Tampilkan status servis terdaftar | Tampilkan status servis terdaftar |
-| `porta logs -f`| Pantau log akses real-time dari `.porta/logs/` | Tail log akses real-time dari `.porta/logs/` |
-| `porta config` | Validasi format file `porta.yaml` | Validasi format file `porta.yaml` |
+| `porta setup` | Inisialisasi folder global `~/.porta/` & cek dependensi | Dipanggil otomatis saat instalasi |
+| `porta doctor` | Cek koneksi internet, loopback bind, dan driver tunnel | Jika terjadi kendala koneksi |
+| `porta init` | Scan port lokal secara otomatis dan buat `porta.yaml` | **Metode Otomatis** |
+| `porta init --force` | Timpa konfigurasi `porta.yaml` lama dengan hasil scan baru | Saat ganti projek / port |
+| `porta config` | Memvalidasi sintaks dan menampilkan struktur routing `porta.yaml` | **Metode Manual** sebelum start |
+| `porta start` | Membuka gateway reverse proxy dan membuat URL publik | Saat ingin membagikan aplikasi ke internet |
+| `porta status` | Menampilkan ringkasan status service yang terhubung | Memeriksa service yang aktif |
+| `porta logs -f` | Menampilkan live streaming log request yang masuk | Debugging request yang gagal/404/500 |
+| `porta upgrade` | Memperbarui binary PORTA ke versi terbaru | Pembaruan versi |
+| `porta version` | Menampilkan versi PORTA yang terpasang | Pengecekan versi |
