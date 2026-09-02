@@ -41,7 +41,7 @@ Backend    (localhost:8000) ──┘         │
 
 ### 1. Installation
 
-Download the pre-compiled standalone binary from the [Releases](https://github.com/porta-dev/porta/releases) page:
+Download the pre-compiled standalone binary from the [GitHub Releases](https://github.com/nuexn0x-9/porta/releases) page:
 
 ```bash
 # Verify installation
