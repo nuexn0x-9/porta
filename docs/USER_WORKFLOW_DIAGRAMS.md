@@ -2,7 +2,13 @@
 
 Dokumen ini menyediakan diagram visual lengkap mulai dari **mengunduh PORTA pertama kali**, inisialisasi proyek, hingga menjalankan terowongan publik di **Windows** dan **Linux**.
 
-![PORTA Usage Infographic](images/porta-usage-infographic.png)
+![PORTA Usage Infographic 1](images/porta-usage-infographic.png)
+<br/>
+
+![PORTA Usage Infographic 2](images/porta-usage-infographic2.png)
+<br/>
+
+![PORTA Usage Infographic 3](images/porta-usage-infographic3.png)
 
 ---
 
