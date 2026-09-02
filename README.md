@@ -1,0 +1,131 @@
+# PORTA
+
+> **Expose your local multi-service application to the world with one command.**
+
+[![Go Version](https://img.shields.io/badge/Go-1.22%2B-00ADD8?style=flat&logo=go)](https://go.dev)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/Release-v1.0.0_MVP-success)](docs/RELEASE_NOTES_v1.0.0.md)
+
+---
+
+## What is PORTA?
+
+**PORTA** is a standalone, client-side developer tool that binds multiple local applications running on `localhost` (e.g. Frontend on `:3000`, Backend API on `:8000`, and WebSocket server on `:9001`) into a single consolidated reverse proxy gateway and exposes them to the public internet via a secure, encrypted HTTPS tunnel.
+
+```text
+Developer Machine                      Public HTTPS Environment
+
+Frontend   (localhost:3000) ──┐
+                              ├─► [ PORTA Gateway ] ──► [ Cloudflare Tunnel ] ──► https://demo-app.trycloudflare.com
+Backend    (localhost:8000) ──┘         │
+                                        ├─► Path: /    ──► Frontend (:3000)
+                                        └─► Path: /api ──► Backend  (:8000)
+```
+
+---
+
+## ✨ Features
+
+- 🚀 **Zero-Friction Ingress:** One command exposes your app via Cloudflare Quick Tunnel — no account, API keys, or credit card required.
+- 🔀 **Unified Ingress Routing:** Expose a single service (`:3000`) or multiple services (`:3000` + `:8000`) under **one public domain**.
+- ⚡ **Full-Duplex WebSockets:** Transparent connection hijacking for hot-module reloading (Vite/Webpack), live chat, and Socket.io.
+- 🌊 **Unbuffered Streaming:** Zero-delay buffer flushing for Server-Sent Events (SSE) and LLM streaming completions.
+- 🛡️ **SSRF & Security Isolation:** Strict loopback validation protecting local workstations from private LAN pivoting and cloud metadata probing.
+- 🔒 **Access Gatekeeper:** Protect public endpoints with HTTP Basic Auth (`401`) or Bearer/Query Tokens (`403`).
+- 🧹 **Safe Logging:** Automatic redaction of sensitive credentials and tokens (`?porta_token=[REDACTED]`) in all logs.
+- 📊 **Interactive Terminal UI:** Real-time ANSI status table with live request streaming and sub-500ms graceful shutdown.
+
+---
+
+## ⚡ Quick Start
+
+### 1. Installation
+
+Download the pre-compiled standalone binary from the [Releases](https://github.com/porta-dev/porta/releases) page:
+
+```bash
+# Verify installation
+porta doctor
+```
+
+### 2. Initialize in your project
+In your project directory where your local apps are running:
+```bash
+porta init
+```
+PORTA automatically detects active listening ports and creates a starter `porta.yaml`.
+
+### 3. Start PORTA
+```bash
+porta start
+```
+PORTA launches the embedded gateway, connects the public HTTPS tunnel, and displays the live TUI in your terminal!
+
+---
+
+## 🛠️ Configuration Example (`porta.yaml`)
+
+```yaml
+version: "1"
+
+project:
+  name: my-app
+
+services:
+  # Single or multi-service configuration
+  frontend:
+    port: 3000
+    route: /
+
+  backend:
+    port: 8000
+    route: /api
+    strip_path: false
+    health_check:
+      path: /healthz
+      interval: 5s
+
+security:
+  mode: password
+  password: ${PORTA_PASSWORD:-admin:SecretDemo123}
+```
+
+---
+
+## 💻 CLI Commands
+
+| Command | Description |
+| :--- | :--- |
+| `porta init` | Scan local listening ports and generate `porta.yaml`. |
+| `porta start` | Start the reverse proxy gateway and public tunnel in foreground. |
+| `porta status` | Inspect configured services, routes, and JSON status. |
+| `porta logs` | Tail and filter structured access logs. |
+| `porta config` | Validate syntax and display parsed configuration. |
+| `porta doctor` | Check loopback networking, internet connectivity, and drivers. |
+
+---
+
+## 📚 Documentation
+
+- [User Guide & Tutorials](docs/USER_GUIDE.md)
+- [Configuration Reference](docs/CONFIGURATION_REFERENCE.md)
+- [Security Model & Threat Defenses](docs/SECURITY_MODEL.md)
+- [System Architecture Specification](docs/SYSTEM_REQUIREMENTS_FINAL.md)
+- [Product Requirements (PRD)](docs/PRODUCT_REQUIREMENTS_FINAL.md)
+- [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
+- [Developer & Contributing Guide](docs/DEVELOPMENT.md)
+
+---
+
+## 🗺️ Roadmap
+
+- [x] **v1.0.0 (MVP):** Foreground CLI, Cloudflare Quick Tunnel, LPM Router, WebSocket, SSRF Guard, TUI.
+- [ ] **v1.1.0:** Detached background daemon mode (`--detach`), persistent custom domains, ngrok driver.
+- [ ] **v1.2.0:** Integrated process orchestrator (`run: npm run dev`), multi-environment configs.
+- [ ] **v2.0.0:** Web inspection dashboard, TCP/UDP tunneling, team collaboration cloud plane.
+
+---
+
+## 📄 License
+
+Licensed under the [Apache License, Version 2.0](LICENSE).

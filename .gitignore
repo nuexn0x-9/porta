@@ -1,0 +1,40 @@
+# Binaries & Compiled Outputs
+/bin/
+/dist/
+*.exe
+*.dll
+*.so
+*.dylib
+/porta
+/porta.exe
+
+# Build & Test Artifacts
+*.test
+coverage.out
+coverage.html
+*.prof
+
+# PORTA Runtime State & Local Data
+.porta/
+porta.log
+access.log
+
+# Environment & Secret Files
+.env
+.env.*
+*.secret
+*.key
+*.pem
+
+# IDE & Editor Configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini

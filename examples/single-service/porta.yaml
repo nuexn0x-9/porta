@@ -1,0 +1,18 @@
+# Single-Service PORTA Configuration
+version: "1"
+
+project:
+  name: single-app
+  environment: development
+
+services:
+  web:
+    port: 3000
+    route: /
+    websocket: true
+
+tunnel:
+  provider: cloudflare
+
+security:
+  mode: public

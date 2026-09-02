@@ -1,0 +1,27 @@
+# Full-Stack Multi-Service PORTA Configuration
+version: "1"
+
+project:
+  name: fullstack-ecommerce
+  environment: development
+
+services:
+  frontend:
+    port: 3000
+    route: /
+    websocket: true
+
+  backend:
+    port: 8000
+    route: /api
+    strip_path: false
+    health_check:
+      path: /healthz
+      interval: 5s
+
+tunnel:
+  provider: cloudflare
+
+security:
+  mode: password
+  password: ${PORTA_AUTH_PASSWORD:-admin:SecretDemo123}

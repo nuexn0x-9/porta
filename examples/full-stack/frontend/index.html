@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PORTA Full-Stack Demo - Frontend</title>
+</head>
+<body>
+    <h1>PORTA Full-Stack Frontend</h1>
+    <p>Running locally on port <code>3000</code></p>
+    <button onclick="fetch('/api/hello').then(r=>r.json()).then(d=>alert(d.message))">Test Backend API</button>
+</body>
+</html>
