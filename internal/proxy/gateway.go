@@ -162,6 +162,7 @@ func (g *Gateway) handleRequest(w http.ResponseWriter, r *http.Request) {
 	proxy.Director = func(req *http.Request) {
 		originalDirector(req)
 		req.URL.Path = match.RewritePath
+		req.URL.RawPath = ""
 		req.Host = targetAddr
 
 		// Header Injection & Sanitation

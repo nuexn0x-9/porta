@@ -80,18 +80,20 @@ services:
 			for idx, p := range detectedPorts {
 				svcName := fmt.Sprintf("service-%d", idx+1)
 				route := fmt.Sprintf("/service-%d", idx+1)
+				stripPathLine := ""
 				if idx == 0 {
 					svcName = "frontend"
 					route = "/"
 				} else if idx == 1 {
 					svcName = "backend"
 					route = "/api"
+					stripPathLine = "    strip_path: false\n"
 				}
 
 				sb.WriteString(fmt.Sprintf(`  %s:
     port: %d
     route: %s
-`, svcName, p, route))
+%s`, svcName, p, route, stripPathLine))
 			}
 
 			sb.WriteString(`
